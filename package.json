@@ -1,0 +1,31 @@
+{
+  "name": "10_playwright",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "compilerOptions": {
+    "types": [
+      "node"
+    ]
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.0",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  },
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

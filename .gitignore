@@ -1,0 +1,26 @@
+# Node
+node_modules/
+
+# Environment Variables
+.env
+.env.*
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+playwright/.auth/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Playwright
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
