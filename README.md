@@ -43,6 +43,8 @@ boekie-automation/
 ├── pages/
 │   ├── CompanyPage.ts
 │   ├── CredentialsPage.ts
+│   ├── ConnectionsPage.ts
+│   ├── ConnectExactOnlinePage.ts
 │   ├── DivisionPage.ts
 │   ├── EmailForwardingPage.ts
 │   ├── EmailPage.ts
@@ -55,15 +57,20 @@ boekie-automation/
 │   ├── StripePage.ts
 │   ├── SuccessPage.ts
 │   └── TaskPage.ts
+│   ├── UpgradePlanPage.ts
 │
 ├── test-data/
 │   └── testData.ts
 │
 ├── tests/
-│   ├── onboarding.spec.ts
-│   ├── login.spec.ts
-│   └── invoice.spec.ts
-│
+│   ├── aiSetting.spec.ts
+│   ├── Connection.spec.ts
+│   └── onboarding.spec.ts
+│   ├── Connection.spec.ts
+│   ├── UpgradePlan.spec.ts
+│   ├── uploadInvoice.spec.ts
+├── utils
+│   └── connectionState.ts
 ├── fixtures/
 │   ├── invoice.pdf
 │   ├── invoice.png
@@ -581,6 +588,127 @@ Invoice      │
              ▼
         Test Completed
 ```
+
+## Connections
+
+Automation supports both accounting software integrations.
+
+### e-Boekhouden
+
+Implemented features:
+
+- Detect connection state.
+- Disconnect existing connection.
+- Handle confirmation popup.
+- Reconnect using API Key.
+- Validate successful connection.
+
+---
+
+### Exact Online
+
+Implemented features:
+
+- Detect connection state.
+- Disconnect existing connection.
+- Handle confirmation popup.
+- OAuth login automation.
+- Enter username.
+- Click Next.
+- Enter password.
+- Complete authorization flow.
+- Redirect back to Boekie.
+- Verify successful connection.
+
+---
+
+# Connection Switching Logic
+
+A utility file is used to remember the last tested accounting software.
+
+```
+utils/
+    connectionState.ts
+```
+
+The workflow is:
+
+Run 1
+
+```
+e-Boekhouden
+        ↓
+Store:
+exactonline
+```
+
+Run 2
+
+```
+Exact Online
+        ↓
+Store:
+eboekhouden
+```
+
+This allows continuous alternating between integrations without modifying the test.
+
+---
+
+# Test Data
+
+Sensitive data is stored inside
+
+```
+test-data/
+    testData.ts
+```
+
+Contains
+
+- Login Email
+- Login Password
+- e-Boekhouden API Key
+- Exact Online Email
+- Exact Online Password
+
+---
+
+# Test Scenario
+
+## Connection Automation
+
+1. Login
+2. Open Profile
+3. Navigate to Connections
+4. Read previous connection state
+5. If previous connection was e-Boekhouden
+
+   - Disconnect
+   - Reconnect
+   - Save Exact Online as next connection
+
+6. If previous connection was Exact Online
+
+   - Disconnect
+   - OAuth Login
+   - Reconnect
+   - Save e-Boekhouden as next connection
+
+---
+
+# Utilities
+
+## connectionState.ts
+
+Responsible for
+
+- Reading last connected software
+- Saving next software
+- Alternating integrations automatically
+
+---
+
 ---
 
 # Best Practices
