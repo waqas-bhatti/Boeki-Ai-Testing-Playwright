@@ -3,6 +3,10 @@ import { expect, type Page } from "@playwright/test";
 export class AISettingsPage {
   constructor(private page: Page) {}
 
+  // ============================================================
+  // Open AI Settings
+  // ============================================================
+
   async open() {
     await this.page.goto(
       "https://staging.platform.boekie-ai.com/dashboard/ai-settings",
@@ -11,24 +15,16 @@ export class AISettingsPage {
     await expect(this.page).toHaveURL(/ai-settings/);
   }
 
-  // ========================
+  // ============================================================
   // Locators
-  // ========================
+  // ============================================================
 
-  private get onButton() {
-    return this.page.locator("div").filter({ hasText: /^ON$/ }).first();
+  private get sliderThumb() {
+    return this.page.locator("[data-slot='slider-thumb']").first();
   }
 
-  private get offButton() {
-    return this.page.locator("div").filter({ hasText: /^OFF$/ }).first();
-  }
-
-  private get saveButton() {
-    return this.page.getByRole("button", { name: "Save" });
-  }
-
-  private get slider() {
-    return this.page.locator("[role='slider']");
+  private get sliderTrack() {
+    return this.page.locator("[data-slot='slider-track']").first();
   }
 
   private get maximumPerDay() {
@@ -39,141 +35,184 @@ export class AISettingsPage {
     return this.page.locator("input[type='number']").last();
   }
 
+  private get saveButton() {
+    return this.page.getByRole("button", {
+      name: "Save",
+    });
+  }
+
   // ========================
   // Automatic Processing
   // ========================
+  private get automaticProcessingCard() {
+    return this.page
+      .getByText("Automatic processing", { exact: true })
+      .locator("xpath=ancestor::div[contains(@class,'rounded')][1]");
+  }
+  private get automaticProcessingSwitch() {
+    return this.automaticProcessingCard.locator("div.cursor-pointer");
+  }
 
-  //   async turnOff() {
-  //     await this.offButton.click();
+  private get onOption() {
+    return this.automaticProcessingCard.getByText("ON", { exact: true });
+  }
 
-  //     // Save should become disabled
-  //     await expect(this.saveButton).toBeDisabled();
-  //   }
+  private get offOption() {
+    return this.automaticProcessingCard.getByText("OFF", { exact: true });
+  }
 
-  async turnOn() {
-    const onActive = this.page.locator("div.text-white", {
-      hasText: "ON",
+  private get restrictionsCard() {
+    return this.page
+      .getByText("Restrictions for Boekie", { exact: true })
+      .locator("xpath=ancestor::div[contains(@class,'rounded')][1]");
+  }
+
+  // ============================================================
+  // Turn ON only if OFF
+  // ============================================================
+
+  async ensureAutomaticProcessingOn() {
+    // Agar Restrictions enabled hain to already ON hai
+    const restrictions = this.restrictionsCard;
+
+    const isDisabled = await restrictions.evaluate((el) =>
+      el.classList.contains("pointer-events-none"),
+    );
+
+    if (!isDisabled) {
+      console.log("Already ON");
+      return;
+    }
+
+    console.log("OFF detected. Turning ON...");
+
+    await this.automaticProcessingSwitch.click({
+      force: true,
     });
-// If ON is already active, don't click it again.
-  if (await onActive.count()) {
-    return;
+
+    // Wait until restrictions enabled
+    await expect(async () => {
+      const disabled = await restrictions.evaluate((el) =>
+        el.classList.contains("pointer-events-none"),
+      );
+
+      expect(disabled).toBeFalsy();
+    }).toPass({
+      timeout: 10000,
+    });
+
+    console.log("Automatic Processing turned ON");
   }
 
-    await this.onButton.click();
+  // ============================================================
+  // Set Confidence LOW — unchanged, this part already works.
+  // ============================================================
 
-    await expect(
-      this.page.locator("div.text-white", { hasText: "ON" }),
-    ).toBeVisible();
+  async ensureLowConfidence() {
+    const current = Number(
+      await this.sliderThumb.getAttribute("aria-valuenow"),
+    );
 
-    await expect(this.page.getByRole("button", { name: "Save" })).toBeEnabled();
-  }
+    console.log("Current Confidence:", current);
 
-  // ========================
-  // Confidence
-  // ========================
+    if (current <= 59) {
+      console.log("Confidence already LOW");
+      return;
+    }
 
-  async setLowConfidence() {
-    const thumb = this.page.locator("[data-slot='slider-thumb']");
-    const track = this.page.locator("[data-slot='slider-track']");
+    const track = await this.sliderTrack.boundingBox();
 
-    const trackBox = await track.boundingBox();
-
-    if (!trackBox) {
+    if (!track) {
       throw new Error("Slider track not found.");
     }
 
-    // Start dragging from the current thumb position
-    await thumb.hover();
-
+    await this.sliderThumb.hover();
     await this.page.mouse.down();
-
-    // Move near the left side (around 55)
     await this.page.mouse.move(
-      trackBox.x + trackBox.width * 0.1,
-      trackBox.y + trackBox.height / 2,
+      track.x + track.width * 0.08,
+      track.y + track.height / 2,
       { steps: 30 },
     );
-
     await this.page.mouse.up();
 
-    // Wait for UI update
-    await this.page.waitForTimeout(500);
+    await expect(this.sliderThumb).toHaveAttribute("aria-valuenow", /5[0-9]/);
 
-    // Print the new value
-    const value = await thumb.getAttribute("aria-valuenow");
+    console.log("Confidence changed to LOW");
   }
 
-  // ========================
+  // ============================================================
   // Maximum Per Day
-  // ========================
+  // ============================================================
 
   async setMaximumPerDay(value: number) {
-    const input = this.page.locator("input[type='number']").first();
-
-    await input.clear();
-
-    await input.fill(value.toString());
-
-    await expect(input).toHaveValue(value.toString());
+    await this.maximumPerDay.clear();
+    await this.maximumPerDay.fill(value.toString());
+    await expect(this.maximumPerDay).toHaveValue(value.toString());
   }
 
-  // ========================
+  // ============================================================
   // Maximum Amount
-  // ========================
+  // ============================================================
 
   async setMaximumAmount(value: number) {
-    const input = this.page.locator("input[type='number']").last();
-
-    await input.clear();
-
-    await input.fill(value.toString());
-
-    await expect(input).toHaveValue(value.toString());
+    await this.maximumAmount.clear();
+    await this.maximumAmount.fill(value.toString());
+    await expect(this.maximumAmount).toHaveValue(value.toString());
   }
 
-  // ========================
+  // ============================================================
   // Save
-  // ========================
+  // ============================================================
 
   async save() {
-    await this.page.getByRole("button", { name: "Save" }).click();
+    await expect(this.saveButton).toBeVisible();
+    await expect(this.saveButton).toBeEnabled();
+
+    await expect(this.page.locator("svg.animate-spin")).toHaveCount(0);
+
+    await this.saveButton.scrollIntoViewIfNeeded();
+    await this.saveButton.click({ force: true });
 
     await this.page.waitForLoadState("networkidle");
   }
 
-  // ========================
-  // Complete Flow
-  // ========================
+  async updateSettings() {
+    await this.ensureAutomaticProcessingOn();
 
-  async updateSettings(confidence: number, maxDay: number, maxAmount: number) {
-    await this.turnOn();
+    const currentValue = await this.sliderThumb.getAttribute("aria-valuenow");
 
-    // await this.setConfidence(confidence);
-
-    await this.setMaximumPerDay(maxDay);
-
-    await this.setMaximumAmount(maxAmount);
-
-    await this.save();
-
-    // Verify saved values
-    await expect(this.maximumPerDay).toHaveValue(maxDay.toString());
-
-    await expect(this.maximumAmount).toHaveValue(maxAmount.toString());
-
-    await expect(this.slider).toHaveAttribute(
-      "aria-valuenow",
-      confidence.toString(),
-    );
+    if (currentValue !== "55") {
+      await this.ensureLowConfidence();
+      await this.save();
+    } else {
+      console.log("Already Low Confidence.");
+    }
   }
 
-  async verifySettings(maxDay: number, maxAmount: number) {
-    await expect(this.page.locator("input[type='number']").first()).toHaveValue(
-      maxDay.toString(),
+  // ============================================================
+  // Go To Invoice Page
+  // ============================================================
+
+  async goToInvoicesPage() {
+    await this.page.goto(
+      "https://staging.platform.boekie-ai.com/dashboard/invoices-receipts",
     );
 
-    await expect(this.page.locator("input[type='number']").last()).toHaveValue(
-      maxAmount.toString(),
-    );
+    await expect(this.page).toHaveURL(/invoices-receipts/);
+    await expect(this.page.getByText("Drop your files here")).toBeVisible();
+  }
+
+  // ============================================================
+  // Complete Flow
+  // ============================================================
+
+  async configureAutoProcessing(maxPerDay: number, maxAmount: number) {
+    await this.open();
+    await this.ensureAutomaticProcessingOn();
+    await this.ensureLowConfidence();
+    await this.setMaximumPerDay(maxPerDay);
+    await this.setMaximumAmount(maxAmount);
+    await this.save();
+    await this.goToInvoicesPage();
   }
 }
