@@ -41,7 +41,9 @@ boekie-automation/
 │   └── IntegrationTracker.ts
 │
 ├── pages/
+│   ├── AISettingsPage.ts
 │   ├── CompanyPage.ts
+│   ├── AuditTrailPage.ts
 │   ├── CredentialsPage.ts
 │   ├── ConnectionsPage.ts
 │   ├── ConnectExactOnlinePage.ts
@@ -708,6 +710,17 @@ Responsible for
 - Alternating integrations automatically
 
 ---
+
+## AI Settings Automation
+- Created Playwright page object for **AI Settings**.
+- Automated navigation to the AI Settings page.
+- Implemented confidence score automation.
+- Added functionality to move the confidence slider to the **Low (55)** range.
+- Added validation for the slider value using `aria-valuenow`.
+- Implemented Maximum Per Day input automation.
+- Implemented Maximum Amount input automation.
+- Added Save button automation.
+- Fixed Save button synchronization issues.
 
 ---
 
