@@ -1,4 +1,3 @@
-
 export const TestData = {
   user: {
     firstName: "Akeem",
@@ -7,34 +6,10 @@ export const TestData = {
     password: "Asdf@12345",
   },
   companies: [
-    "Tech-IT",
-    "SVA IT Tech",
-    "True-Tech IT",
-    "Mountain IT tech",
-    "Techno IT Solutions",
-    "Techno IT Solutions B.V.",
-    "Techno IT Solutions B.V.",
-    "Techno IT Solutions B.V.",
-    "Techno IT Solutions B.V.",
-    "Techno IT Solutions B.V.",
-    "Bright IT Tech",
-    "Bisschop.tech IT Consultancy",
-    "Jiv-Tech IT Consultancy",
-    "Tech Mahindra IT Services NL",
-    "Jespers IT & Tech Solutions",
-    "Tech IT Talents B.V.",
-    "ASIA IT TECH B.V.",
-    "Tech It Easy B.V.",
-    "IT Tech Genius B.V.",
-    "Hi Tech-IT B.V.",
-    "In It 4 The Tech B.V.",
-    "Hi Tech-IT B.V.",
-    "IT Tech Genius B.V.",
-    "ASIA IT TECH B.V.",
-    "Stichting Administratiekantoor Hi Tech-IT",
-    "Tech IT Talents B.V.",
-    "Tech It Easy B.V.",
-    "Education - IT and Tech - Nicks Solutions",
+    "Paper for Paper B.V.",
+    "Paper Crown",
+    "Paper Solutions",
+    "Paper Story",
   ],
 
   manualCompany: {
@@ -54,6 +29,7 @@ export const TestData = {
     apiKey: "QLF2tdGaGVZOpkiGMt_B2IMwAzRnEVDZl5rjORpICCFSFQxU2F",
   },
   payment: {
+    email: "f9fmp8yzyl@ozsaip.com",
     cardNumber: "4242 4242 4242 4242",
     expiry: "11/33",
     cvc: "424",
@@ -63,7 +39,68 @@ export const TestData = {
 };
 
 export const LoginData = {
-  email: "mesyfasugi@mailinator.com",
+  email: "cahucitoqu@mailinator.com",
 
   password: "Pa$$w0rd!",
 };
+
+// Small local random-data helper — no external dependency (like
+// faker) needed for this. Picks from a fixed pool each run so names
+// are realistic-looking but still randomized.
+
+const FIRST_NAMES = [
+  "Stewart",
+  "Emma",
+  "Liam",
+  "Sophie",
+  "Daan",
+  "Mila",
+  "Noah",
+  "Anna",
+  "Lucas",
+  "Julia",
+];
+
+const LAST_NAMES = [
+  "Turner",
+  "Jansen",
+  "de Vries",
+  "Bakker",
+  "Visser",
+  "Smit",
+  "Meijer",
+  "Mulder",
+  "de Boer",
+  "Peters",
+];
+
+function pickRandom(list: string[]): string {
+  const randomIndex = Math.floor(Math.random() * list.length);
+  const value = list[randomIndex];
+
+  if (value === undefined) {
+    throw new Error("Random selection returned undefined.");
+  }
+
+  return value;
+}
+
+export function randomFirstName(): string {
+  return pickRandom(FIRST_NAMES);
+}
+
+export function randomLastName(): string {
+  return pickRandom(LAST_NAMES);
+}
+
+const COUNTRIES = ["Netherlands", "Belgium", "Germany", "France"];
+
+export function randomCountry(): string {
+  return pickRandom(COUNTRIES);
+}
+
+/** Generates a plausible-looking Dutch mobile number, randomized. */
+export function randomPhoneNumber(): string {
+  const digits = Math.floor(10000000 + Math.random() * 89999999);
+  return `+31 6 ${digits}`;
+}

@@ -48,6 +48,7 @@ boekie-automation/
 │   ├── ConnectionsPage.ts
 │   ├── ConnectExactOnlinePage.ts
 │   ├── DivisionPage.ts
+│   ├── EditInvoicePage.ts
 │   ├── EmailForwardingPage.ts
 │   ├── EmailPage.ts
 │   ├── ExactOnlinePage.ts
@@ -55,6 +56,8 @@ boekie-automation/
 │   ├── InvoiceUploadPage.ts
 │   ├── LoginPage.ts
 │   ├── PackagePage.ts
+│   ├── PaymentPage.ts
+│   ├── ProfilePage.ts
 │   ├── SignUpPage.ts
 │   ├── StripePage.ts
 │   ├── SuccessPage.ts
@@ -68,7 +71,8 @@ boekie-automation/
 │   ├── aiSetting.spec.ts
 │   ├── Connection.spec.ts
 │   └── onboarding.spec.ts
-│   ├── Connection.spec.ts
+│   ├── editInvoice.spec.ts
+│   ├── ProfileUpdate.spec.ts
 │   ├── UpgradePlan.spec.ts
 │   ├── uploadInvoice.spec.ts
 ├── utils
@@ -696,6 +700,65 @@ Contains
    - OAuth Login
    - Reconnect
    - Save e-Boekhouden as next connection
+
+   Dynamic data is generated for
+
+- First Name
+- Last Name
+- Phone Number
+- Company Name
+- Email
+- Random User Data
+
+Example
+
+```ts
+const profile = ProfileData.generate();
+```
+
+---
+
+# Implemented Test Scenarios
+
+## Login
+
+- Valid Login
+- Invalid Login
+- Dashboard Verification
+
+---
+
+## Invoice Processing
+
+- Edit Ledger Account
+- Edit VAT
+- Confirm Invoice
+- Capture Invoice Number
+- Audit Trail Verification
+- Booking Line Verification
+
+---
+
+## Audit Trail
+
+- Search Invoice
+- Open Audit Card
+- Open Approved Booking Proposal
+- Verify Ledger Account
+- Verify VAT
+
+---
+
+## Profile Management
+
+- Login
+- Navigate to Profile
+- Verify Email Read Only
+- Update First Name
+- Update Last Name
+- Update Country
+- Update Phone Number
+- Save Profile
 
 ---
 
